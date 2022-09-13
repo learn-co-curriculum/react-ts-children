@@ -24,7 +24,8 @@ of the `div`.
 In React, you might create a reusable version of this HTML by doing the following:
 
 ```jsx
-function Header(props) {
+
+function Header(props: { header: string; description: string }) {
   return (
     <div class="container">
       <h1>{props.header}</h1>
@@ -88,7 +89,7 @@ So far you've seen components rendered like this using the **self-closing tag**
 syntax:
 
 ```jsx
-function Example(props) {
+function Example(props: { exampleProp: exampleType }) {
   return <div>{props.exampleProp}</div>;
 }
 
@@ -118,7 +119,44 @@ component. So now, we can access the `children` prop and render the children in
 the same way we would render any array of elements:
 
 ```jsx
-function Example(props) {
+interface Props {
+  exampleProp: string;
+  children: // hm...
+}
+
+function Example(props: Props) {
+  return (
+    <div>
+      {props.exampleProp}
+      {/* using the children prop to render any elements inside the opening and closing tag of Example */}
+      {props.children}
+    </div>
+  );
+}
+```
+
+But wait - what type do we give the `children` prop? Instinctively, we might 
+think `JSX.Element`. That has been the default prop for all our React JSX so far. 
+
+That could certainly work, but it would only expect a single JSX element. To fix
+that, we could make it a union type like `JSX.Element | JSX.Element[]`. That would 
+work regardless of how many children there are. 
+
+Still, that's not quite right. `JSX.Element` only expects _elements_. What if we just
+have a child that is solely a string, or solely a number not wrapped inside some 
+sort of element?
+
+For that, we use another type interface provided by react called `React.ReactNode`. 
+Now, that accepts JSX elements, string, numbers, _and_ we don't have to make a 
+union type to make it work for either single or multiple children. 
+
+```jsx
+interface Props {
+  exampleProp: string;
+  children: React.ReactNode;
+}
+
+function Example(props: Props) {
   return (
     <div>
       {props.exampleProp}
